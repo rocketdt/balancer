@@ -5,6 +5,7 @@
 package proxy
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -44,6 +45,11 @@ func NewHTTPProxy(targetHosts []string, algorithm string) (*HTTPProxy, error) {
 			return nil, err
 		}
 		proxy := httputil.NewSingleHostReverseProxy(url)
+
+		customTransport := &(*http.DefaultTransport.(*http.Transport)) // make shallow copy
+		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+		proxy.Transport = customTransport
 
 		originDirector := proxy.Director
 		proxy.Director = func(req *http.Request) {
