@@ -27,17 +27,14 @@ var (
 
 // HTTPProxy refers to a reverse proxy in the balancer
 type HTTPProxy struct {
-	hostMap map[string]*httputil.ReverseProxy
-	lb      balancer.Balancer
-
+	hostMap      map[string]*httputil.ReverseProxy
+	lb           balancer.Balancer
 	sync.RWMutex // protect alive
 	alive        map[string]bool
 }
 
 // NewHTTPProxy create  new reverse proxy with url and balancer algorithm
-func NewHTTPProxy(targetHosts []string, algorithm string) (
-	*HTTPProxy, error) {
-
+func NewHTTPProxy(targetHosts []string, algorithm string) (*HTTPProxy, error) {
 	hosts := make([]string, 0)
 	hostMap := make(map[string]*httputil.ReverseProxy)
 	alive := make(map[string]bool)
