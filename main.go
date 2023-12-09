@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/zehuamama/balancer/proxy"
+	"github.com/rocketdt/balancer/proxy"
 )
 
 func main() {

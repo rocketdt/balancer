@@ -1,4 +1,4 @@
-module github.com/zehuamama/balancer
+module github.com/rocketdt/balancer
 
 go 1.21
 
