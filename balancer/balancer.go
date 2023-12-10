@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	NoHostError                = errors.New("no host")
-	AlgorithmNotSupportedError = errors.New("algorithm not supported")
+	NoHostError                = errors.New("目前没有服务器运行")
+	AlgorithmNotSupportedError = errors.New("不支持算法")
 )
 
 // Balancer interface is the load balancer for the reverse proxy

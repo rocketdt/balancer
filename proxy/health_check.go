@@ -33,7 +33,14 @@ func (h *HTTPProxy) HealthCheck(interval uint) {
 func (h *HTTPProxy) healthCheck(host string, interval uint) {
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	for range ticker.C {
-		alive := IsBackendAlive(host)
+		alive := false
+
+		if h.fptr != nil {
+			alive = h.fptr(host)
+		} else {
+			alive = IsBackendAlive(host)
+		}
+
 		readAlive := h.ReadAlive(host)
 
 		// log.Printf("Alive = %+v, Read alive = %+v\n", alive, readAlive)
