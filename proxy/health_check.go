@@ -5,7 +5,8 @@
 package proxy
 
 import (
-	"log"
+	"fmt"
+	"os"
 	"time"
 )
 
@@ -46,12 +47,16 @@ func (h *HTTPProxy) healthCheck(host string, interval uint) {
 		// log.Printf("Alive = %+v, Read alive = %+v\n", alive, readAlive)
 
 		if !alive && readAlive {
-			log.Printf("Site unreachable, remove %s from load balancer.", host)
+			// log.Printf("Site unreachable, remove %s from load balancer.", host)
+			fmt.Fprintf(os.Stderr, "[%s] Site unreachable, remove %s from load balancer.",
+				time.Now().Format("2006-01-02 15:04:05"), host)
 
 			h.SetAlive(host, false)
 			h.lb.Remove(host)
 		} else if alive && !readAlive {
-			log.Printf("Site reachable, add %s to load balancer.", host)
+			// log.Printf("Site reachable, add %s to load balancer.", host)
+			fmt.Fprintf(os.Stderr, "[%s] Site reachable, add %s from load balancer.",
+				time.Now().Format("2006-01-02 15:04:05"), host)
 
 			h.SetAlive(host, true)
 			h.lb.Add(host)
