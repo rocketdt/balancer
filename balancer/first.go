@@ -30,3 +30,14 @@ func (r *First) Balance(_ string) (string, error) {
 	}
 	return r.hosts[0], nil
 }
+
+func (b *First) Add(host string) {
+	b.Lock()
+	defer b.Unlock()
+	for _, h := range b.hosts {
+		if h == host {
+			return
+		}
+	}
+	b.hosts = append(b.hosts, host)
+}
