@@ -5,8 +5,44 @@
 package balancer
 
 import (
+	"sort"
 	"sync"
 )
+
+// -----------------------------------
+
+type HostPriority struct {
+	host     string
+	priority int
+}
+
+type ByHostPriority []HostPriority
+
+func (a ByHostPriority) Len() int           { return len(a) }
+func (a ByHostPriority) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByHostPriority) Less(i, j int) bool { return a[i].priority < a[j].priority }
+
+func sortHosts(hostL []string, p map[string]int) []string {
+	hpL := make([]HostPriority, len(hostL))
+	ret := make([]string, len(hostL))
+
+	for k, h := range hostL {
+		hpL[k] = HostPriority{
+			host:     h,
+			priority: p[h],
+		}
+	}
+
+	sort.Sort(ByHostPriority(hpL))
+
+	for k, hp := range hpL {
+		ret[k] = hp.host
+	}
+
+	return ret
+}
+
+// -----------------------------------
 
 func init() {
 	factories[FirstBalancer] = NewFirst
@@ -55,7 +91,14 @@ func (b *First) Add(host string) {
 		}
 	}
 
+	if len(b.hosts) < 2 {
+		b.hosts = append(b.hosts, host)
+		return
+	}
+
 	b.hosts = append(b.hosts, host)
+	hL := sortHosts(b.hosts[1:], b.priority)
+	b.hosts = append([]string{b.hosts[0]}, hL...)
 }
 
 // Remove new host from the balancer
