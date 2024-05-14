@@ -14,13 +14,21 @@ func init() {
 
 type First struct {
 	sync.RWMutex
-	hosts []string
+	hosts    []string
+	priority map[string]int
 }
 
 // NewRandom create new Random balancer
 func NewFirst(hosts []string) Balancer {
+	priority := map[string]int{}
+
+	for k, host := range hosts {
+		priority[host] = k + 1
+	}
+
 	return &First{
-		hosts: hosts,
+		hosts:    hosts,
+		priority: priority,
 	}
 }
 
@@ -28,9 +36,11 @@ func NewFirst(hosts []string) Balancer {
 func (r *First) Balance(_ string) (string, error) {
 	r.RLock()
 	defer r.RUnlock()
+
 	if len(r.hosts) == 0 {
 		return "", NoHostError
 	}
+
 	return r.hosts[0], nil
 }
 
@@ -38,11 +48,13 @@ func (r *First) Balance(_ string) (string, error) {
 func (b *First) Add(host string) {
 	b.Lock()
 	defer b.Unlock()
+
 	for _, h := range b.hosts {
 		if h == host {
 			return
 		}
 	}
+
 	b.hosts = append(b.hosts, host)
 }
 
@@ -50,6 +62,7 @@ func (b *First) Add(host string) {
 func (b *First) Remove(host string) {
 	b.Lock()
 	defer b.Unlock()
+
 	for i, h := range b.hosts {
 		if h == host {
 			b.hosts = append(b.hosts[:i], b.hosts[i+1:]...)
